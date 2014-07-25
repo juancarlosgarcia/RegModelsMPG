@@ -1,0 +1,62 @@
+Transmission Effects On MPG In Cars
+====================================
+
+# Executive Summary
+In this paper, we look at 1974 Motor Trend Data [1] for the purpose of evaluating factors on fuel efficiency. We specifically are interested in the
+effects of automatic vs manual transmission on the gas mileage. Our analysis predicted that the weight of the car directly related, and the choice of manual or automatic depends on it.
+
+# Data
+The data frame consists of 32 observations on 11 variables.
+- mpg: Miles/(US) gallon
+- cyl: Number of cylinders
+- disp: Displacement (cu.in.)
+- hp: Gross horsepower
+- drat: Rear axle ratio
+- wt: Weight (lb/1000)
+- qsec: 1/4 mile time
+- vs: V/S
+- am: Transmission (0 = automatic, 1 = manual)
+- gear: Number of forward gears
+
+```{r data,echo=TRUE}
+data(mtcars)
+mtcarst <- within(mtcars, {
+am <- factor(am, labels = c("Automatic", "Manual"))
+vs <- factor(vs, labels = c("Vengine", "Iengine"))
+})
+head(mtcarst)
+```
+
+# Exploratory Data Analysis
+The initial exploration of the data use a boxplot in the [Appendix](#boxplot) shows a comparison miles per gallon (MPG) versus transmission (0 = “Automatic”, 1 = “Manual”). This plot motivates us to build a linear regression for MPG over transmission.
+
+The pairs scatterplots in the [Appendix](#scatter) allows to observe that MPG appeared to be highly correlated with all the variables
+except rear axle ratio and transmission.
+
+#Models
+We need to check that a relationship does exist between MPG and Transmission with a simple linear model.
+
+```{r model1}
+model1 <- lm(mpg ~ am, mtcarst)
+summary(model1)$coefficients
+summary(model1)
+
+```
+We can see a string relationship does exist with a p-value 
+
+# Appendix
+
+## MPG versus Transmission
+```{r boxplot}
+op <- par(mar = c(2,2,1,1))
+boxplot(mpg ~ am, data = mtcarst)
+stripchart(mpg ~ am, data = mtcarst, vertical = T, method = "jitter", pch = 20, add = T)
+par(op)
+```
+## MPG against all variables
+```{r scatter}
+require(graphics)
+pairs(mtcarst[, c(1:6,9)], panel = panel.smooth)
+```
+
+
