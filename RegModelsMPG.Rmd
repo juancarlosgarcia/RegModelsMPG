@@ -1,11 +1,70 @@
 Transmission Effects On MPG In Cars
 ====================================
 
-# Executive Summary
-In this paper, we look at 1974 Motor Trend Data [1] for the purpose of evaluating factors on fuel efficiency. We specifically are interested in the
-effects of automatic vs manual transmission on the gas mileage. Our analysis predicted that the weight of the car directly related, and the choice of manual or automatic depends on it.
+```{r data,echo=FALSE}
+data(mtcars)
+mtcarst <- within(mtcars, {
+am <- factor(am, labels = c("Automatic", "Manual"))
+vs <- factor(vs, labels = c("Vengine", "Iengine"))
+cyl <- factor(cyl)
+})
+```
 
-# Data
+## 1. Executive Summary
+This paper is based at 1974 Motor Trend Data that contains fuel consumption related with 10 aspects of automobile design and performance for 32 cars models 1973-74. The purpose is to estimate the effect of the type of transmission (automatic vs manual) on the miles per gallon (MPG). The results suggest that manual transmission have a higher MPG. However the weight and horse power are attibutes that have a siginficant influence in the results.
+
+## 2. Exploratory Data Analysis
+Based on common sense we can assume that the mpg of a car depends on its weight and its power, also the cars with more cylinders have a larger displacement and more horse power. The following plot shows these theories.
+
+```{r, echo=FALSE,fig.height=3,fig.width=10}
+p<-c(16,17)
+c<-c(4,6,8)
+cl <- c("4 cyl.","6 cyl.","8 cyl.")
+tl <- c("Automatic","Manual")
+
+par(mfcol=c(1,2), mar=c(3.5,3.5,0,0.5), oma=c(0.5,5.5,0.5,0.5),cex=1,mgp=c(1.7,0.5,0))
+with(mtcars,plot(mpg~wt,col=cyl,pch=am+p[1],xlab="Weight (lb/1000)",ylab="Miles/(US) gallon",main=""))
+legend("topright",pch=p,legend=tl,bty="n")
+legend("bottomleft",text.col=c,legend=cl,bty="n")
+
+with(mtcars,plot(hp~disp,col=cyl,pch=am+p[1],xlab="Displacement (cu.in.)",ylab="Gross Horsepower",main=""))
+legend("topleft",pch=p,legend=tl,bty="n")
+legend("bottomright",text.col=c,legend=cl,bty="n")
+```
+
+The left plot offer following insights:
+* 2.1.1 The cars with automatic transmission are heavy.
+* 2.1.2 The cars with manual transmission are lightweight.
+* 2.1.2 A positive relationship between number of cylinders and weight.
+* 2.1.3 A negative relationship between MPG and weight.
+
+The right plot offer following insights:
+* 2.2.1 A linear relationship between displacement and horse power.
+* 2.2.2 There is not a relation between number of cylinders and displacement.
+* 2.2.3 Cars with more cylinders provides major horsepower.
+* 2.2.4 Cars with more horsepower have automatic transmission.
+
+#Models
+We need to check that a relationship does exist between MPG and Transmission with a simple linear model.
+
+```{r model1}
+model1 <- lm(mpg ~ am, mtcarst)
+summary(model1)$coefficients
+```
+We can see a strong relationship does exist with a p-value < 0.001 considering only transmission. However we have to evaluate this factors: weight, and number of cylinders.
+
+```{r model2}
+model2 <- update(model1, mpg ~ am + wt)
+summary(model2)$coefficients
+```
+
+```{r model3}
+model3 <- update(model1, mpg ~ am + wt + cyl)
+summary(model3)$coefficients
+```
+
+# Appendix
+## Data
 The data frame consists of 32 observations on 11 variables.
 - mpg: Miles/(US) gallon
 - cyl: Number of cylinders
@@ -18,33 +77,10 @@ The data frame consists of 32 observations on 11 variables.
 - am: Transmission (0 = automatic, 1 = manual)
 - gear: Number of forward gears
 
-```{r data,echo=TRUE}
-data(mtcars)
-mtcarst <- within(mtcars, {
-am <- factor(am, labels = c("Automatic", "Manual"))
-vs <- factor(vs, labels = c("Vengine", "Iengine"))
-})
+```{r sample,echo=FALSE}
 head(mtcarst)
 ```
 
-# Exploratory Data Analysis
-The initial exploration of the data use a boxplot in the [Appendix](#boxplot) shows a comparison miles per gallon (MPG) versus transmission (0 = “Automatic”, 1 = “Manual”). This plot motivates us to build a linear regression for MPG over transmission.
-
-The pairs scatterplots in the [Appendix](#scatter) allows to observe that MPG appeared to be highly correlated with all the variables
-except rear axle ratio and transmission.
-
-#Models
-We need to check that a relationship does exist between MPG and Transmission with a simple linear model.
-
-```{r model1}
-model1 <- lm(mpg ~ am, mtcarst)
-summary(model1)$coefficients
-summary(model1)
-
-```
-We can see a string relationship does exist with a p-value 
-
-# Appendix
 
 ## MPG versus Transmission
 ```{r boxplot}
@@ -56,7 +92,7 @@ par(op)
 ## MPG against all variables
 ```{r scatter}
 require(graphics)
-pairs(mtcarst[, c(1:6,9)], panel = panel.smooth)
+pairs(mpg ~ .,data = mtcarst, panel = panel.smooth)
 ```
 
 
