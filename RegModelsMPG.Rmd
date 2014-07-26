@@ -11,10 +11,10 @@ cyl <- factor(cyl)
 ```
 
 ## 1. Executive Summary
-This paper is based at 1974 Motor Trend Data that contains fuel consumption related with 10 aspects of automobile design and performance for 32 cars models 1973-74. The purpose is to estimate the effect of the type of transmission (automatic vs manual) on the miles per gallon (MPG). The results suggest that manual transmission have a higher MPG. However the weight and horse power are attibutes that have a siginficant influence in the results.
+This paper is based at 1974 Motor Trend Data that contains fuel consumption related with 10 aspects of automobile design and performance for 32 cars models 1973-74. The purpose is to estimate the effect of the type of transmission (automatic vs manual) on the miles per gallon (MPG). The results suggest that manual transmission have a higher MPG. However the weight and acceleration are attibutes that have a siginficant influence in the results.
 
 ## 2. Exploratory Data Analysis
-Based on common sense we can assume that the mpg of a car depends on its weight and its power, also the cars with more cylinders have a larger displacement and more horse power. The following plot shows these theories.
+Based on common sense we can assume that the mpg of a car depends on its weight and its power, also the cars with more cylinders have a great acceleration and more horse power. The following plot shows these theories.
 
 ```{r, echo=FALSE,fig.height=3,fig.width=10}
 p<-c(16,17)
@@ -27,44 +27,55 @@ with(mtcars,plot(mpg~wt,col=cyl,pch=am+p[1],xlab="Weight (lb/1000)",ylab="Miles/
 legend("topright",pch=p,legend=tl,bty="n")
 legend("bottomleft",text.col=c,legend=cl,bty="n")
 
-with(mtcars,plot(hp~disp,col=cyl,pch=am+p[1],xlab="Displacement (cu.in.)",ylab="Gross Horsepower",main=""))
-legend("topleft",pch=p,legend=tl,bty="n")
-legend("bottomright",text.col=c,legend=cl,bty="n")
+with(mtcars,plot(hp~qsec,col=cyl,pch=am+p[1],xlab="Acceleration (qsec)",ylab="Gross Horsepower",main=""))
+legend("topright",pch=p,legend=tl,bty="n")
+legend("bottomleft",text.col=c,legend=cl,bty="n")
 ```
 
 The left plot offer following insights:
-* 2.1.1 The cars with automatic transmission are heavy.
-* 2.1.2 The cars with manual transmission are lightweight.
-* 2.1.2 A positive relationship between number of cylinders and weight.
-* 2.1.3 A negative relationship between MPG and weight.
+* The cars with automatic transmission are heavy.
+* The cars with manual transmission are lightweight.
+* A positive relationship between number of cylinders and weight.
+* A negative relationship between MPG and weight.
 
 The right plot offer following insights:
-* 2.2.1 A linear relationship between displacement and horse power.
-* 2.2.2 There is not a relation between number of cylinders and displacement.
-* 2.2.3 Cars with more cylinders provides major horsepower.
-* 2.2.4 Cars with more horsepower have automatic transmission.
+* A strong relationship between acceleration and horse power.
+* Cars with more cylinders has great acceleration in lest time.
+* Cars with more cylinders provides major horsepower.
+* Cars with more horsepower have automatic transmission.
 
-#Models
-We need to check that a relationship does exist between MPG and Transmission with a simple linear model.
+Also see the correlation matrix in the Appendix.
 
-```{r model1}
-model1 <- lm(mpg ~ am, mtcarst)
-summary(model1)$coefficients
+## 3. Models
+The exploratory analysis suggested to use the wt variable with some power variables (cyl, hp) is a good start. An interesting insight is the acceleration that is strongly influenced by 8 cylinders cars therefore we will evaluate it. The models to analyze are:
+
+```{r models, echo=FALSE}
+model1 <- lm(mpg ~ am : wt + am : cyl, mtcarst) 
+model2 <- lm(mpg ~ am : wt + am : hp, mtcarst)
+model3 <- lm(mpg ~ am : wt + am : qsec, mtcarst)
+formula(model1)
+formula(model2)
+formula(model3)
 ```
-We can see a strong relationship does exist with a p-value < 0.001 considering only transmission. However we have to evaluate this factors: weight, and number of cylinders.
 
-```{r model2}
-model2 <- update(model1, mpg ~ am + wt)
-summary(model2)$coefficients
-```
+See the Appendix for results of model 1 and model 2. The stimation results reveal that model 3 is the best fit according following:
 
 ```{r model3}
-model3 <- update(model1, mpg ~ am + wt + cyl)
-summary(model3)$coefficients
+summary(model3)
 ```
 
-# Appendix
-## Data
+### 3.1 Model Validation
+The model has a 88% Adjusted R-Squared, and contains three variables (transmission type, weight, and acceleration) along with the transmission interaction. The residuals are normal with 0 mean and constant variance. The "Residual vs Fitted" and "Scale Location" charts show that there is no trend to the residuals. The Q-Q plot shows that the errors are aproximately distributed. The p-values for am are considered statistically significant.
+
+### 3.2 Model Interpretation
+**For constant quarter-mile-time:** For each unit of increase in quarter-mile-time (1 unit = 1 sec), there is a 0.834 mpg increase for automatic cars while there is a 1.446 mpg increase for manual cars. This means manual cars have more efficient acceleration than automatic but in both cases require more fuel. 
+
+**For constant weight (lb/1000):** For each unit of increase in weight (1 unit = 1000 lb) there is 3.176 decrease for automatic cars while there is a 6.099 mpg decrease for manual cars. This means heavier cars in general require more fuel altought automatic cars consumes less fuel than manual.
+
+
+
+## Appendix
+### Data
 The data frame consists of 32 observations on 11 variables.
 - mpg: Miles/(US) gallon
 - cyl: Number of cylinders
@@ -81,18 +92,35 @@ The data frame consists of 32 observations on 11 variables.
 head(mtcarst)
 ```
 
-
-## MPG versus Transmission
-```{r boxplot}
-op <- par(mar = c(2,2,1,1))
-boxplot(mpg ~ am, data = mtcarst)
-stripchart(mpg ~ am, data = mtcarst, vertical = T, method = "jitter", pch = 20, add = T)
-par(op)
-```
-## MPG against all variables
+### MPG against all variables
 ```{r scatter}
 require(graphics)
-pairs(mpg ~ .,data = mtcarst, panel = panel.smooth)
+panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...) {
+usr <- par("usr"); on.exit(par(usr))
+par(usr = c(0, 1, 0, 1))
+r <- cor(x, y)
+txt <- format(c(r, 0.123456789), digits=digits)[1]
+txt <- paste(prefix, txt, sep="")
+if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+text(0.5, 0.5, txt, cex = cex.cor * abs(r))
+}
+pairs(mpg~am:., data=mtcarst, lower.panel=panel.smooth, upper.panel=panel.cor, pch=20, main="Scatterplot - Correlation Matrix")
+
 ```
 
+### Models
+**Model 1**
+```{r model1}
+summary(model1)
+```
 
+**Model 2**
+```{r model2}
+summary(model2)
+```
+
+**Selected Model Plot**
+```{r modelval}
+par(mfrow=c(2,2),cex.main=0.1,cex=0.6,mgp=c(1.7,0.5,0),mar=c(4,3.5,2,0.5),oma=c(0.5,10,0.5,0.5))
+plot(model3)
+```
