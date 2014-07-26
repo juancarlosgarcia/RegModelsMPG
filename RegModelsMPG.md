@@ -36,15 +36,33 @@ The exploratory analysis suggested to use the wt variable with some power variab
 ```
 
 ```
+##                  Estimate Std. Error t value  Pr(>|t|)
+## (Intercept)        33.820     2.7313  12.382 3.656e-12
+## amAutomatic:wt     -3.409     0.8671  -3.931 5.912e-04
+## amManual:wt        -2.981     1.3630  -2.187 3.831e-02
+## amAutomatic:cyl6   -3.143     2.0524  -1.531 1.382e-01
+## amManual:cyl6      -5.041     2.1177  -2.380 2.524e-02
+## amAutomatic:cyl8   -4.780     2.0536  -2.327 2.834e-02
+## amManual:cyl8      -8.374     2.8825  -2.905 7.574e-03
+```
+
+```
 ## mpg ~ am:wt + am:hp
+```
+
+```
+##                Estimate Std. Error t value  Pr(>|t|)
+## (Intercept)    36.21665    2.40962  15.030 1.226e-14
+## amAutomatic:wt -3.36820    0.95787  -3.516 1.566e-03
+## amManual:wt    -3.29638    1.48606  -2.218 3.514e-02
+## amAutomatic:hp -0.03846    0.01584  -2.428 2.214e-02
+## amManual:hp    -0.03300    0.01406  -2.347 2.650e-02
 ```
 
 ```
 ## mpg ~ am:wt + am:qsec
 ```
 
-
-See the Appendix for results of model 1 and model 2. The stimation results reveal that model 3 is the best fit according following:
 
 
 ```r
@@ -75,6 +93,8 @@ summary(model3)
 ## F-statistic: 57.3 on 4 and 27 DF,  p-value: 8.42e-13
 ```
 
+The stimation results reveal that model 3 is the best fit.
+
 
 ### 3.1 Model Validation
 The model has a 88% Adjusted R-Squared, and contains three variables (transmission type, weight, and acceleration) along with the transmission interaction. The residuals are normal with 0 mean and constant variance. The "Residual vs Fitted" and "Scale Location" charts show that there is no trend to the residuals. The Q-Q plot shows that the errors are aproximately distributed. The p-values for am are considered statistically significant.
@@ -87,37 +107,6 @@ The model has a 88% Adjusted R-Squared, and contains three variables (transmissi
 
 
 ## Appendix
-### Data
-The data frame consists of 32 observations on 11 variables.
-- mpg: Miles/(US) gallon
-- cyl: Number of cylinders
-- disp: Displacement (cu.in.)
-- hp: Gross horsepower
-- drat: Rear axle ratio
-- wt: Weight (lb/1000)
-- qsec: 1/4 mile time
-- vs: V/S
-- am: Transmission (0 = automatic, 1 = manual)
-- gear: Number of forward gears
-
-
-```
-##                    mpg cyl disp  hp drat    wt  qsec      vs        am
-## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46 Vengine    Manual
-## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02 Vengine    Manual
-## Datsun 710        22.8   4  108  93 3.85 2.320 18.61 Iengine    Manual
-## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44 Iengine Automatic
-## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02 Vengine Automatic
-## Valiant           18.1   6  225 105 2.76 3.460 20.22 Iengine Automatic
-##                   gear carb
-## Mazda RX4            4    4
-## Mazda RX4 Wag        4    4
-## Datsun 710           4    1
-## Hornet 4 Drive       3    1
-## Hornet Sportabout    3    2
-## Valiant              3    1
-```
-
 
 ### MPG against all variables
 
@@ -141,72 +130,7 @@ pairs(mpg ~ am:., data = mtcarst, lower.panel = panel.smooth, upper.panel = pane
 ![plot of chunk scatter](figure/scatter.png) 
 
 
-### Models
-**Model 1**
-
-```r
-summary(model1)
-```
-
-```
-## 
-## Call:
-## lm(formula = mpg ~ am:wt + am:cyl, data = mtcarst)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -4.133 -1.223 -0.173  1.272  5.550 
-## 
-## Coefficients:
-##                  Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)        33.820      2.731   12.38  3.7e-12 ***
-## amAutomatic:wt     -3.409      0.867   -3.93  0.00059 ***
-## amManual:wt        -2.981      1.363   -2.19  0.03831 *  
-## amAutomatic:cyl6   -3.143      2.052   -1.53  0.13822    
-## amManual:cyl6      -5.041      2.118   -2.38  0.02524 *  
-## amAutomatic:cyl8   -4.780      2.054   -2.33  0.02834 *  
-## amManual:cyl8      -8.374      2.882   -2.91  0.00757 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.63 on 25 degrees of freedom
-## Multiple R-squared:  0.847,	Adjusted R-squared:  0.81 
-## F-statistic:   23 on 6 and 25 DF,  p-value: 4.82e-09
-```
-
-
-**Model 2**
-
-```r
-summary(model2)
-```
-
-```
-## 
-## Call:
-## lm(formula = mpg ~ am:wt + am:hp, data = mtcarst)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -3.679 -2.066 -0.305  0.941  5.878 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)     36.2167     2.4096   15.03  1.2e-14 ***
-## amAutomatic:wt  -3.3682     0.9579   -3.52   0.0016 ** 
-## amManual:wt     -3.2964     1.4861   -2.22   0.0351 *  
-## amAutomatic:hp  -0.0385     0.0158   -2.43   0.0221 *  
-## amManual:hp     -0.0330     0.0141   -2.35   0.0265 *  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.66 on 27 degrees of freedom
-## Multiple R-squared:  0.83,	Adjusted R-squared:  0.805 
-## F-statistic:   33 on 4 and 27 DF,  p-value: 4.91e-10
-```
-
-
-**Selected Model Plot**
+### Selected Model Plot
 
 ```r
 par(mfrow = c(2, 2), cex.main = 0.1, cex = 0.6, mgp = c(1.7, 0.5, 0), mar = c(4, 

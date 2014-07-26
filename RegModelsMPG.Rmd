@@ -54,15 +54,17 @@ model1 <- lm(mpg ~ am : wt + am : cyl, mtcarst)
 model2 <- lm(mpg ~ am : wt + am : hp, mtcarst)
 model3 <- lm(mpg ~ am : wt + am : qsec, mtcarst)
 formula(model1)
+summary(model1)$coefficients
 formula(model2)
+summary(model2)$coefficients
 formula(model3)
 ```
-
-See the Appendix for results of model 1 and model 2. The stimation results reveal that model 3 is the best fit according following:
 
 ```{r model3}
 summary(model3)
 ```
+The stimation results reveal that model 3 is the best fit.
+
 
 ### 3.1 Model Validation
 The model has a 88% Adjusted R-Squared, and contains three variables (transmission type, weight, and acceleration) along with the transmission interaction. The residuals are normal with 0 mean and constant variance. The "Residual vs Fitted" and "Scale Location" charts show that there is no trend to the residuals. The Q-Q plot shows that the errors are aproximately distributed. The p-values for am are considered statistically significant.
@@ -75,22 +77,6 @@ The model has a 88% Adjusted R-Squared, and contains three variables (transmissi
 
 
 ## Appendix
-### Data
-The data frame consists of 32 observations on 11 variables.
-- mpg: Miles/(US) gallon
-- cyl: Number of cylinders
-- disp: Displacement (cu.in.)
-- hp: Gross horsepower
-- drat: Rear axle ratio
-- wt: Weight (lb/1000)
-- qsec: 1/4 mile time
-- vs: V/S
-- am: Transmission (0 = automatic, 1 = manual)
-- gear: Number of forward gears
-
-```{r sample,echo=FALSE}
-head(mtcarst)
-```
 
 ### MPG against all variables
 ```{r scatter}
@@ -108,18 +94,7 @@ pairs(mpg~am:., data=mtcarst, lower.panel=panel.smooth, upper.panel=panel.cor, p
 
 ```
 
-### Models
-**Model 1**
-```{r model1}
-summary(model1)
-```
-
-**Model 2**
-```{r model2}
-summary(model2)
-```
-
-**Selected Model Plot**
+### Selected Model Plot
 ```{r modelval}
 par(mfrow=c(2,2),cex.main=0.1,cex=0.6,mgp=c(1.7,0.5,0),mar=c(4,3.5,2,0.5),oma=c(0.5,10,0.5,0.5))
 plot(model3)
